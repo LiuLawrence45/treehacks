@@ -15,19 +15,32 @@ ExpressWs(app);
 const PORT = process.env.PORT || 3000;
 
 
-app.get("/test", (req, res) => {
-    const twiml = `<?xml version="1.0" encoding="UTF-8"?>
-    <Response>
-    <Say voice="woman">Thanks for trying our documentation. Enjoy!</Say>
-    <Play>http://demo.twilio.com/docs/classic.mp3</Play>
-    </Response>
-  `;
+// app.get("/test", (req, res) => {
+//     const twiml = `<?xml version="1.0" encoding="UTF-8"?>
+//     <Response>
+//     <Say voice="woman">Thanks for trying our documentation. Enjoy!</Say>
+//     <Play>http://demo.twilio.com/docs/classic.mp3</Play>
+//     </Response>
+//   `;
 
-  res.type('text/xml');
-  res.send(twiml);
-});
+//   res.type('text/xml');
+//   res.send(twiml);
+// });
 
 app.post("/incoming", (req, res) => {
+
+  const Twilio = require('twilio');
+  const twiml = new Twilio.twiml.VoiceResponse();
+
+  twiml.say('Hello, please tell me what you need help with.');
+
+  twiml.gather({
+    input: 'speech',
+    action: '/process_speech',
+    method: 'POST',
+    timeout: 5,
+    speechTimeout: 'auto'
+  });
 
     res.status(200);
     res.type("text/xml");

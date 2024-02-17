@@ -28,24 +28,15 @@ frame_counter = 0
 def process_frame(frame):
     try:
         _, buffer = cv2.imencode('.jpg', frame)
-        # stream = BytesIO(buffer)
+        stream = BytesIO(buffer)
 
-        # Detect objects in the frame
-        detected_objects_future = executor.submit(computervision_client.detect_objects_in_stream, buffer)
-
-        # stream.seek(0)
-
-        description_future = executor.submit(computervision_client.describe_image_in_stream, buffer, max_descriptions, language)
-
-        detected_objects = detected_objects_future.result()
+        description_future = executor.submit(computervision_client.describe_image_in_stream, stream, max_descriptions, language)
+        stream.seek(0)
         analysis = description_future.result()
-
-        for caption in analysis.captions:
-            print(f"Caption: {caption.text}, Confidence: {caption.confidence}")
-
-        if detected_objects.objects:
-            for obj in detected_objects.objects:
-                print(f"Object: {obj.object_property}, Confidence: {obj.confidence}")
+        if analysis.captions: 
+            for caption in analysis.captions:
+                print(f"Caption: {caption.text}, Confidence: {caption.confidence}")
+            print("------------------")
     except Exception as e:
         print(f"Exception in processing frame: {e}")
 

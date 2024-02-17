@@ -15,14 +15,16 @@ import dotenv
 from concurrent.futures import ThreadPoolExecutor
 dotenv.load_dotenv()
 
-
-
 # General variables
 subscription_key = os.getenv("AZURE_API_KEY")
 endpoint = os.getenv("VISION_ENDPOINT") 
 computervision_client = ComputerVisionClient(endpoint, CognitiveServicesCredentials(subscription_key))
 cap = cv2.VideoCapture(1)
 
+client = ImageAnalysisClient(
+    endpoint=endpoint,
+    credential=AzureKeyCredential(key)
+)
 
 executor = ThreadPoolExecutor(max_workers = 2)
 
@@ -39,7 +41,36 @@ try:
         if frame_counter % 24 == 0:
 
             _, buffer = cv2.imencode('.jpg', frame)
-            stream = BytesIO(buffer)
+            # Analyze a broader range of visual features
+            analysis = computervision_client.analyze_image_in_stream(
+                stream,
+                visual_features=visual_features,
+                language=language
+            )
+
+            # Utilize the broader analysis results
+            if analysis.description.captions:
+                for caption in analysis.description.captions:
+                    print(f"Caption: {caption.text}, Confidence: {caption.confidence}")
+
+            if analysis.objects:
+                for obj in analysis.objects:
+                    print(f"Object: {obj.object_property}, Confidence: {obj.confidence}")
+
+            # Example of using additional features like tags and color
+            if analysis.tags:
+                print("Tags:", ", ".join([tag.name for tag in analysis.tags]))
+            if analysis.color:
+                print(f"Dominant Colors: {analysis.color.dominant_colors}")
+
+            # Analyze all visual features from an image stream. This will be a synchronously (blocking) call.
+            result = client.analyze_from_url(
+                image_url=image_url,
+                visual_features=visual_features,
+                smart_crops_aspect_ratios=[0.9, 1.33],
+                gender_neutral_caption=True,
+                language="en"
+            )
 
             # detected_objects = computervision_client.detect_objects_in_stream(frame)
 
@@ -75,6 +106,7 @@ try:
 finally:
     cap.release()
     cv2.destroyAllWindows()
+
 
 
 

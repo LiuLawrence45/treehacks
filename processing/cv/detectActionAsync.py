@@ -30,15 +30,21 @@ def process_frame(frame):
         _, buffer = cv2.imencode('.jpg', frame)
         stream = BytesIO(buffer)
 
-        description_future = executor.submit(computervision_client.describe_image_in_stream, stream, max_descriptions, language)
+        description_future = executor.submit(computervision_client.describe_image_in_stream, stream, max_descriptions)
+        # tags_future = executor.submit(computervision_client.tag_image, buffer)
         stream.seek(0)
         analysis = description_future.result()
+        #tags = tags_future.result()
         if analysis.captions: 
             for caption in analysis.captions:
                 print(f"Caption: {caption.text}, Confidence: {caption.confidence}")
             print("------------------")
+        # if tags.results():
+        #     print("\n".join(tags.tags))
     except Exception as e:
         print(f"Exception in processing frame: {e}")
+
+
 
 try:
     while True:

@@ -3,8 +3,6 @@ import os
 from twilio.rest import Client
 import cv2
 import numpy as np
-# import mediapipe as mp
-import tensorflow as tf
 # Set environment variables for your credentials
 # Read more at http://twil.io/secure
 

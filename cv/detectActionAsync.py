@@ -18,7 +18,7 @@ endpoint = os.getenv("VISION_ENDPOINT")
 computervision_client = ComputerVisionClient(endpoint, CognitiveServicesCredentials(subscription_key))
 cap = cv2.VideoCapture(1)
 
-executor = ThreadPoolExecutor(max_workers=2)
+executor = ThreadPoolExecutor(max_workers=4)
 
 language = "en"
 max_descriptions = 3

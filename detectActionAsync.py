@@ -28,14 +28,14 @@ frame_counter = 0
 def process_frame(frame):
     try:
         _, buffer = cv2.imencode('.jpg', frame)
-        stream = BytesIO(buffer)
+        # stream = BytesIO(buffer)
 
         # Detect objects in the frame
-        detected_objects_future = executor.submit(computervision_client.detect_objects_in_stream, stream)
+        detected_objects_future = executor.submit(computervision_client.detect_objects_in_stream, buffer)
 
-        stream.seek(0)
+        # stream.seek(0)
 
-        description_future = executor.submit(computervision_client.describe_image_in_stream, stream, max_descriptions, language)
+        description_future = executor.submit(computervision_client.describe_image_in_stream, buffer, max_descriptions, language)
 
         detected_objects = detected_objects_future.result()
         analysis = description_future.result()

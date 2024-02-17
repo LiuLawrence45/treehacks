@@ -1,2 +1,2 @@
 # treehacks
-CV, Security, and Calls
+will update with notes as we go on!

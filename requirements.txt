@@ -29,7 +29,6 @@ libclang==16.0.6
 Markdown==3.5.2
 MarkupSafe==2.1.5
 matplotlib==3.8.3
-mediapipe==0.9.1.0
 ml-dtypes==0.2.0
 multidict==6.0.5
 numpy==1.26.4

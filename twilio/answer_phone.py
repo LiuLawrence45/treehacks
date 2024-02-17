@@ -4,7 +4,8 @@ from twilio.twiml.voice_response import VoiceResponse
 app = Flask(__name__)
 
 
-@app.route("/answer", methods=['GET', 'POST'])
+
+@app.route("/", methods=['GET', 'POST'])
 def answer_call():
     """Respond to incoming phone calls with a brief message."""
     # Start our TwiML response
@@ -17,4 +18,3 @@ def answer_call():
 
 if __name__ == "__main__":
     app.run(debug=True)
-    

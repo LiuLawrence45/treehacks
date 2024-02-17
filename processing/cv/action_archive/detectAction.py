@@ -19,7 +19,7 @@ dotenv.load_dotenv()
 subscription_key = os.getenv("AZURE_API_KEY")
 endpoint = os.getenv("VISION_ENDPOINT") 
 computervision_client = ComputerVisionClient(endpoint, CognitiveServicesCredentials(subscription_key))
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 
 client = ImageAnalysisClient(
     endpoint=endpoint,
@@ -71,6 +71,11 @@ try:
                 gender_neutral_caption=True,
                 language="en"
             )
+
+            # Load image to analyze into a 'bytes' object
+            with open("sample.jpg", "rb") as f:
+                image_data = f.read()
+
 
             # detected_objects = computervision_client.detect_objects_in_stream(frame)
 

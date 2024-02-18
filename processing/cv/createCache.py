@@ -38,13 +38,13 @@ class FrameCache:
 
 
 
-def process_frames_with_gpt4(frames, results):
+def process_frames_with_gpt4(frames, results, batch_id):
     print(f"Processing {len(frames)} frames with GPT-4")
 
 
 
     # Generate unique id. 
-    batch_id = uuid.uuid4()
+    # batch_id = uuid.uuid4()
 
     # dynamic_name, summary = analyze_and_summarize(results, batch_id)
 
@@ -72,7 +72,7 @@ def process_frames_with_gpt4(frames, results):
 
 
 
-def analyze_and_summarize(results): ## HELPER
+def analyze_and_summarize(results, batch_id): ## HELPER
     # Assuming results is a list of dictionaries or similar structure that GPT can process
     try:
         client = OpenAI(
@@ -87,7 +87,16 @@ def analyze_and_summarize(results): ## HELPER
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": f"Below is a list of files that outline an action in JSON. Infer and tell me what action occurred between these files, specifically focusing on the people. Take a deep breath, and think clearly. Only state to me what you think the inferred action is, and the number of people in the frame over time."},
+                {"role": "system", "content": f"""
+                 
+Below is a list of files that outline an 
+action in JSON. Infer and tell me what action occurred between these 
+files, specifically focusing on the people. Take a deep breath, and think 
+clearly. Only state to me what you think the inferred action is, and the 
+number of people in the frame over time.
+"""
+
+},
                 {"role": "user", "content": f"{results_json}"}
             ],
             temperature=0.5,
@@ -100,7 +109,8 @@ def analyze_and_summarize(results): ## HELPER
         summary = response.choices[0].message.content.strip()
 
         # For dynamic naming, you could use a part of the summary or any other logic
-        dynamic_name = "Summary_" + str(uuid.uuid4())
+        # dynamic_name = "Summary_" + str(uuid.uuid4())
+        dynamic_name = "Summary_" + str(batch_id)
         print("Dynamic name: ", dynamic_name)
         print("Summary:" , summary)
         return dynamic_name, summary
@@ -110,7 +120,7 @@ def analyze_and_summarize(results): ## HELPER
         return "Error", "Could not analyze and summarize results."
     
 
-def analyze_cache():
+def analyze_cache_all():
     cache_folder = 'processing/cv/cache/'
     for filename in os.listdir(cache_folder):
         if filename.endswith('.txt'):
@@ -124,6 +134,20 @@ def analyze_cache():
                 with open(summary_filename, 'w') as summary_file:
                     summary_file.write(f"Filename: {filename}\nSummary: {summary}")
                 print(f"Saved summary to {summary_filename}")
+
+def analyze_cache(results_array, batch_id):
+    cache_folder = 'processing/cv/cache/'
+    
+    # Convert ImageAnalysisResult objects in results_array to a serializable format
+    results_array_serializable = [result.as_dict() for result in results_array]
+    dynamic_name, summary = analyze_and_summarize(results_array_serializable, batch_id)
+    summary_json = json.dumps({'name': dynamic_name, 'summary': summary})
+    # Write the filename and summary to another file in the cache folder
+    summary_filename = os.path.join(cache_folder, f"{dynamic_name}.txt")
+    with open(summary_filename, 'w') as summary_file:
+        summary_file.write(f"Filename: {dynamic_name}\nSummary: {summary}")
+    print(f"Saved summary to {summary_filename}")
+
 
     
 

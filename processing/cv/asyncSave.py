@@ -19,6 +19,8 @@ import requests
 from ultralytics import YOLO  # Assuming YOLOv8 is accessible through ultralytics
 from createCache import process_frames_with_gpt4, FrameCache, analyze_and_summarize, analyze_cache
 import sys
+from threading import Thread
+import uuid
 # Load the model
 model = YOLO('processing/cv/smallest-YOLO.pt')
 
@@ -60,12 +62,12 @@ frame_counter = 0
 
 # Define a comprehensive list of visual features available
 visual_features =[
-        VisualFeatures.TAGS,
+        # VisualFeatures.TAGS,
         VisualFeatures.OBJECTS,
-        VisualFeatures.CAPTION,
+        # VisualFeatures.CAPTION,
         VisualFeatures.DENSE_CAPTIONS,
-        VisualFeatures.READ,
-        VisualFeatures.SMART_CROPS,
+        # VisualFeatures.READ,
+        # VisualFeatures.SMART_CROPS,
         VisualFeatures.PEOPLE,
     ]
 
@@ -92,22 +94,22 @@ def process_frame(frame, results_array):
 
         results_array.append(result)
 
-        print(" Caption:")
-        print(f"   '{result.caption.text}', Confidence {result.caption.confidence:.4f}")
+        # print(" Caption:")
+        # print(f"   '{result.caption.text}', Confidence {result.caption.confidence:.4f}")
 
         print(" Dense Captions:")
         for caption in result.dense_captions.list:
             print(f"   '{caption.text}', {caption.bounding_box}, Confidence: {caption.confidence:.4f}")
 
-        print(" Read:")
-        for line in result.read.blocks[0].lines:
-            print(f"   Line: '{line.text}', Bounding box {line.bounding_polygon}")
-            for word in line.words:
-                print(f"     Word: '{word.text}', Bounding polygon {word.bounding_polygon}, Confidence {word.confidence:.4f}")
+        # print(" Read:")
+        # for line in result.read.blocks[0].lines:
+        #     print(f"   Line: '{line.text}', Bounding box {line.bounding_polygon}")
+        #     for word in line.words:
+        #         print(f"     Word: '{word.text}', Bounding polygon {word.bounding_polygon}, Confidence {word.confidence:.4f}")
 
-        print(" Tags:")
-        for tag in result.tags.list:
-            print(f"   '{tag.name}', Confidence {tag.confidence:.4f}")
+        # print(" Tags:")
+        # for tag in result.tags.list:
+        #     print(f"   '{tag.name}', Confidence {tag.confidence:.4f}")
 
         print(" Objects:")
         for object in result.objects.list:
@@ -117,9 +119,9 @@ def process_frame(frame, results_array):
         for person in result.people.list:
             print(f"   {person.bounding_box}, Confidence {person.confidence:.4f}")
 
-        print(" Smart Cropping:")
-        for smart_crop in result.smart_crops.list:
-            print(f"   Aspect ratio {smart_crop.aspect_ratio}: Smart crop {smart_crop.bounding_box}")
+        # print(" Smart Cropping:")
+        # for smart_crop in result.smart_crops.list:
+        #     print(f"   Aspect ratio {smart_crop.aspect_ratio}: Smart crop {smart_crop.bounding_box}")
 
     except Exception as e:
         print(f"Exception in processing frame: {e}")
@@ -141,15 +143,18 @@ try:
             executor.submit(process_frame, frame, results_array)
 
         if i % (30*4) == 0:
+            batch_id = uuid.uuid4()
             cached_frames = frame_cache.get_and_clear()
-            executor.submit(process_frames_with_gpt4, cached_frames, results_array)
+            executor.submit(process_frames_with_gpt4, cached_frames, results_array, batch_id)
+            analyze_thread = Thread(target=analyze_cache, args=(results_array, batch_id))
+            analyze_thread.start()
+            # analyze_thread.join()
             results_array = []
         cv2.imshow('Video', frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
-            future = executor.submit(analyze_cache) ## ADDING ANALYze TO FUTURES
-
+            # future = executor.submit(analyze_cache) ## ADDING ANALYze TO FUTURES
             break
 finally:
-    future.result() # WAITING FOR FUTURE TO FINISH
+   # future.result() # WAITING FOR FUTURE TO FINISH
     cap.release()
     cv2.destroyAllWindows()

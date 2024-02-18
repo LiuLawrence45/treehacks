@@ -17,7 +17,7 @@ dotenv.load_dotenv()
 import json
 import requests
 from ultralytics import YOLO  # Assuming YOLOv8 is accessible through ultralytics
-from processing.cv.createCache import process_frames_with_gpt4, FrameCache
+from createCache import process_frames_with_gpt4, FrameCache
 import sys
 # Load the model
 model = YOLO('processing/cv/smallest-YOLO.pt')
@@ -45,7 +45,7 @@ params = {
     
 
 client = ImageAnalysisClient(endpoint = endpoint, credential = AzureKeyCredential(subscription_key))
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 
 
 #Initialize FrameCache for GPT 4 
@@ -142,7 +142,7 @@ try:
 
         if i % (24*6) == 0:
             cached_frames = frame_cache.get_and_clear()
-            # executor.submit(process_frames_with_gpt4, cached_frames, results_array)
+            executor.submit(process_frames_with_gpt4, cached_frames, results_array)
             results_array = []
         cv2.imshow('Video', frame)
 

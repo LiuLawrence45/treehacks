@@ -59,3 +59,5 @@ def process_frames_with_gpt4(frames, results):
             file.write(str(result) + '\n')
 
     print(f"Saved frames to {video_filename} and results to {results_filename}.")
+
+    

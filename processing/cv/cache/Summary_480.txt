@@ -1,0 +1,13 @@
+Filename: Summary_480
+Summary: {
+    "action": [
+        {
+            "summary": "The people in the room were taking selfies, holding phones, and standing in a group. Some were sitting at a table. One person was holding a can, another a water bottle, and one person was wearing khaki pants. There were also people wearing glasses and a black shirt. The actions implied include taking selfies, holding phones, and standing in a group."
+        }
+    ],
+    "objects": [
+        {
+            "object": ["phone", "can", "water bottle", "khaki pants", "glasses", "black shirt"]
+        }
+    ]
+}

@@ -1,0 +1,5 @@
+Filename: Summary_720
+Summary: {
+    "action": [{"summary": "The people in the room were standing, sitting at a table, taking a selfie, holding a phone, and raising hands. Some were wearing tan pants and black hoodies. There was a blurry image of a person's face, head, and a man wearing a hat. Additionally, there was a person's buttocks with a condom visible in one frame."}],
+    "objects": [{"object": ["phone", "table", "suitcase", "chair", "hat", "condom"]}]}
+}

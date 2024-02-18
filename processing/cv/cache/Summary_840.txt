@@ -1,0 +1,6 @@
+Filename: Summary_840
+Summary: {
+    "action": [{"summary": "The people in the frames are mostly sitting at a table, with some standing and holding phones. There are instances of a person wearing a black jacket and a person wearing a black shirt. One person is seen sitting at a table with a black suitcase on a black surface. Some people are shown in close-up images, and there is a blurry image of a man wearing a hat and sunglasses. Laptops are also present on the table in one of the frames."}],
+    "objects": [{"object": ["table", "phone", "chair", "man", "group of people", "black jacket", "black shirt", "black suitcase", "laptop", "hat", "sunglasses", "phone", "leg", "hand", "person", "square", "box"]}]
+
+}

@@ -72,7 +72,7 @@ def process_frames_with_gpt4(frames, results, batch_id):
 
 
 
-def analyze_and_summarize(results, batch_id): ## HELPER
+def analyze_and_summarize(results, batch_id, user_flag): ## HELPER
     # Assuming results is a list of dictionaries or similar structure that GPT can process
     try:
         client = OpenAI(
@@ -87,26 +87,109 @@ def analyze_and_summarize(results, batch_id): ## HELPER
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": """
-                 
-
-                 
+                {"role": "system", "content": f"""          
 You are a company secretary that only speaks in JSON. Do not generate output that is not in properly formatted JSON. The input has the following format, composed of a list of chronological model outputs that contain the following.
+                 
                  1. 'denseCaptionsResult': describing the bounding box location of specific object in an image frame, along with text describing the object
                  2. 'peopleResult': describing the bounding box location of people in a given frame.
         
 Remember, the model outputs are chronological. Those at the top of the input happened earlier than those later in the input. 
 
-Extract and infer information from the input, specifically of people movement, and objects of prominence in the given frame. The output must abide by the following rules.
-                 1. ALWAYS FINISH THE OUTPUT. Never send partial responses
-                 2. When inferencing people movement, generate it as variable `summarized_actions`. This variable should show prominent actions that are inferred from movements of objects and people in frame. There should be logical jumps made from the data given--take a deep breath and think about what people movements are implied from the input. Further, the variable `summarized_objects`, should be a list of obejcts that are in frame and are prominent. `summarized objects` should look like, ["water bottle", "chips", "phone."]. 
-                 
-                 3. The output should ALWAYS be formatted as a JSON as such:
-                    {
-                        "action": [{"summary": `summarized_actions`}],
-                        "objects":[{"object": `summarized_objects`}]
-                    }
+Analyze the entire frame deeply to see if user query {user_flag} has relevance. Relevance will be assigned a boolean value in variable `relevance`. Here are examples of relevance.
+
+Example 1: User Flag = "cat"
+    Input Data:
+
+    Frame 1:
+    denseCaptionsResult: A small cat sitting on a windowsill, looking outside.
+    peopleResult: No people detected in this frame.
+    Frame 2:
+    denseCaptionsResult: The same cat now lying down, still on the windowsill.
+    peopleResult:"No people detected in this frame.
+    Analysis:
+
+    The user query is specifically looking for a "cat".
+    The denseCaptionsResult for both frames explicitly mentions a cat in the scene.
+    There are no interactions with people as peopleResult indicates no human presence.
+    Output:
+        {{
+        "relevance": true,
+        "reason": "The video contains multiple frames showing a cat, directly matching the user's query."
+        }}
+Example 2: User Flag = "group of people dancing"
+    Frame 1:
+    denseCaptionsResult: A group of five people dancing in a circle.
+    peopleResult: Bounding boxes showing five people closely interacting.
+    Frame 2:
+    denseCaptionsResult: The group continues to dance, one person is jumping.
+    peopleResult: "Bounding boxes still show five people, with one depicted in a jumping pose."
+    Analysis:
+
+    The user query is about "group of people dancing".
+    Both the denseCaptionsResult and peopleResult confirm the presence and activity of a group dancing over multiple frames.
+    Output:
+        {{
+        "relevance": true,
+        "reason": "The frames consistently show a group of people dancing, which aligns with the user's query."
+        }}
+Example 3: User Flag = "sunset"
+    Input Data:
+
+    Frame 1:
+    denseCaptionsResult: A beautiful sunset visible behind mountains.
+    peopleResult: No people detected in this frame.
+    Frame 2:
+    denseCaptionsResult: The sun has almost set, with vibrant colors in the sky.
+    peopleResult: A silhouette of a person admiring the sunset.
+    Analysis:
+
+    The user query is looking for a "sunset".
+    The denseCaptionsResult for both frames captures the essence of a sunset, making it relevant.
+    The presence of a person in the second frame does not detract from the relevance to the sunset query.
+    Output:
+        {{
+        "relevance": true,
+        "reason": "Both frames feature the sunset, which is the main focus of the user's query."
+        }}
+Example 4: User Flag = "fast-moving car"
+    Input Data:
+
+    Frame 1:
+    denseCaptionsResult: A car speeding on a highway, motion blur visible.
+    peopleResult: No people detected outside of the car.
+    Frame 2:
+    denseCaptionsResult: The car continues to speed, now changing lanes.
+    peopleResult: No people detected outside of the car.
+    Analysis:
+
+    The user query is about a "fast-moving car".
+    The denseCaptionsResult in both frames clearly indicates the presence of a car moving at high speed, with details like motion blur and lane changing supporting this.
+    Output:
+        {{
+        "relevance": true,
+        "reason": "The video consistently shows a fast-moving car across multiple frames, aligning with the user's query."
+        }}
 """
+                 
+### OLD PROMPT.       
+# You are a company secretary that only speaks in JSON. Do not generate output that is not in properly formatted JSON. The input has the following format, composed of a list of chronological model outputs that contain the following.
+#                  1. 'denseCaptionsResult': describing the bounding box location of specific object in an image frame, along with text describing the object
+#                  2. 'peopleResult': describing the bounding box location of people in a given frame.
+        
+# Remember, the model outputs are chronological. Those at the top of the input happened earlier than those later in the input. 
+
+# Most importantly, extract and infer information from the input, specifically of people movements, interactions, and objects of prominence in the given frame. The output must abide by the following rules.
+#                  1. ALWAYS FINISH THE OUTPUT. Never send partial responses
+#                  2. When inferencing people movement, generate it as variable `summarized_actions`. This variable should show prominent actions and interactions that are inferred from movements of objects and people in frame. Be creative, yet accurate with finding interactions between objects/people. There should be logical jumps made from the data given--take a deep breath and think about what people movements are implied from the input. Further, the variable `summarized_objects`, should be a list of objects that are in frame and are prominent. `summarized objects` should look like, ["water bottle", "chips", "phone."]. 
+                 
+#                  3. The output should ALWAYS be formatted as a JSON as such:
+#                     {
+#                         "action": [{"summary": `summarized_actions`}],
+#                         "objects":[{"object": `summarized_objects`}]
+#                     }
+# """
+                 
+                 
 
 },
                 {"role": "user", "content": f"{results_json}"}
@@ -147,12 +230,12 @@ def analyze_cache_all():
                     summary_file.write(f"Filename: {filename}\nSummary: {summary}")
                 print(f"Saved summary to {summary_filename}")
 
-def analyze_cache(results_array, batch_id):
+def analyze_cache(results_array, batch_id, user_flag):
     cache_folder = 'processing/cv/cache/'
     
     # Convert ImageAnalysisResult objects in results_array to a serializable format
     results_array_serializable = [result.as_dict() for result in results_array]
-    dynamic_name, summary = analyze_and_summarize(results_array_serializable, batch_id)
+    dynamic_name, summary = analyze_and_summarize(results_array_serializable, batch_id, user_flag)
     summary_json = json.dumps({'name': dynamic_name, 'summary': summary})
     # Write the filename and summary to another file in the cache folder
     summary_filename = os.path.join(cache_folder, f"{dynamic_name}.txt")

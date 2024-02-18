@@ -1,0 +1,13 @@
+Filename: Summary_600
+Summary: {
+    "action": [
+        {
+            "summary": "The two men were initially holding bottles of water. Later, one man was seen holding a bottle of water and a cell phone. There was also a mention of a man holding a gun and a clear plastic container. In the second frame, one man was holding a spray bottle. People were seen wearing tan pants, black pants, and khaki pants. Additionally, a person was standing in a room with other people, a man was sitting at a table, and a person was holding a black device."
+        }
+    ],
+    "objects": [
+        {
+            "object": ["bottle of water", "cell phone", "gun", "clear plastic container", "spray bottle"]
+        }
+    ]
+}

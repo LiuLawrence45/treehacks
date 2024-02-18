@@ -1,0 +1,5 @@
+Filename: Summary_120
+Summary: {
+    "action": [{"summary": "The man in glasses with his hands in his pockets was initially standing alone and then later seen with a group of men sitting at a table. There was also a man wearing glasses and a sweatshirt. The group of men seemed to be interacting."}],
+    "objects": [{"object": ["man", "glasses", "hands", "pockets", "table", "sweatshirt", "logo", "chair", "hat", "person's face", "person's eyes", "snow", "ground", "black object", "red surface", "person's arm", "people", "background", "photo", "leg", "head", "woman"]}]
+}

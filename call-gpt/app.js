@@ -14,6 +14,18 @@ ExpressWs(app);
 
 const PORT = process.env.PORT || 3000;
 
+// app.post("/incoming", (req, res) => {
+//   res.status(200);
+//   res.type("text/xml");
+//   res.end(`
+//   <Response>
+//     <Connect>
+//       <Stream url="wss://${process.env.SERVER}/connection" />
+//     </Connect>
+//   </Response>
+//   `);
+// });
+
 app.post("/incoming", (req, res) => {
   res.status(200);
   res.type("text/xml");
@@ -26,8 +38,11 @@ app.post("/incoming", (req, res) => {
   `);
 });
 
+
+
 app.ws("/connection", (ws, req) => {
   ws.on("error", console.error);
+  console.log((console.error).red)
   // Filled in from start message
   let streamSid;
 

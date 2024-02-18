@@ -5,10 +5,8 @@ require("dotenv").config();
 // npm inbound
 async function makeInboundCall() {
   const VoiceResponse = require('twilio').twiml.VoiceResponse;
-  // const accountSid = process.env.TWILIO_ACCOUNT_SID;
-  const accountSid = "AC1322e254b1ecc1169dc491b8a1984c4a"
-  //const authToken = process.env.TWILIO_AUTH_TOKEN;
-  const authToken = "ee5b9136790008927ce2b9d90e566459"
+  const accountSid = process.env.TWILIO_ACCOUNT_SID;
+  const authToken = process.env.TWILIO_AUTH_TOKEN;
   
   const client = require('twilio')(accountSid, authToken);
   
@@ -23,10 +21,8 @@ async function makeInboundCall() {
   await client.calls
     .create({
         twiml: twiml.toString(),
-        // to: process.env.APP_NUMBER,
-        // from: process.env.FROM_NUMBER
-        to: '+14122251447',
-        from: '+18447492281'
+        to: process.env.TO_NUMBER,
+        from: process.env.FROM_NUMBER
       })
     .then(call => console.log(call.sid));
 }  

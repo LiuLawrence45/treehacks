@@ -63,7 +63,7 @@ frame_counter = 0
 # Define a comprehensive list of visual features available
 visual_features =[
         # VisualFeatures.TAGS,
-        VisualFeatures.OBJECTS,
+        # VisualFeatures.OBJECTS,
         # VisualFeatures.CAPTION,
         VisualFeatures.DENSE_CAPTIONS,
         # VisualFeatures.READ,
@@ -111,9 +111,9 @@ def process_frame(frame, results_array):
         # for tag in result.tags.list:
         #     print(f"   '{tag.name}', Confidence {tag.confidence:.4f}")
 
-        print(" Objects:")
-        for object in result.objects.list:
-            print(f"   '{object.tags[0].name}', {object.bounding_box}, Confidence: {object.tags[0].confidence:.4f}")
+        # print(" Objects:")
+        # for object in result.objects.list:
+        #     print(f"   '{object.tags[0].name}', {object.bounding_box}, Confidence: {object.tags[0].confidence:.4f}")
 
         print(" People:")
         for person in result.people.list:

@@ -87,13 +87,25 @@ def analyze_and_summarize(results, batch_id): ## HELPER
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": f"""
+                {"role": "system", "content": """
                  
-Below is a list of files that outline an 
-action in JSON. Infer and tell me what action occurred between these 
-files, specifically focusing on the people. Take a deep breath, and think 
-clearly. Only state to me what you think the inferred action is, and the 
-number of people in the frame over time.
+
+                 
+You are a company secretary that only speaks in JSON. Do not generate output that is not in properly formatted JSON. The input has the following format, composed of a list of chronological model outputs that contain the following.
+                 1. 'denseCaptionsResult': describing the bounding box location of specific object in an image frame, along with text describing the object
+                 2. 'peopleResult': describing the bounding box location of people in a given frame.
+        
+Remember, the model outputs are chronological. Those at the top of the input happened earlier than those later in the input. 
+
+Extract and infer information from the input, specifically of people movement, and objects of prominence in the given frame. The output must abide by the following rules.
+                 1. ALWAYS FINISH THE OUTPUT. Never send partial responses
+                 2. When inferencing people movement, generate it as variable `summarized_actions`. This variable should show prominent actions that are inferred from movements of objects and people in frame. There should be logical jumps made from the data given--take a deep breath and think about what people movements are implied from the input. Further, the variable `summarized_objects`, should be a list of obejcts that are in frame and are prominent. `summarized objects` should look like, ["water bottle", "chips", "phone."]. 
+                 
+                 3. The output should ALWAYS be formatted as a JSON as such:
+                    {
+                        "action": [{"summary": `summarized_actions`}],
+                        "objects":[{"object": `summarized_objects`}]
+                    }
 """
 
 },

@@ -1,0 +1,5 @@
+Filename: Summary_120
+Summary: {
+    "relevance": false,
+    "reason": "The user query does not match the content of the frames. The frames primarily focus on a man taking a selfie and do not contain any water bottle references."
+}

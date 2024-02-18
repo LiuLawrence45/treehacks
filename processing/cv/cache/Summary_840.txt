@@ -1,0 +1,5 @@
+Filename: Summary_840
+Summary: {
+    "relevance": false,
+    "reason": "The video does not contain any relevant information about a water bottle in any of the frames."
+}

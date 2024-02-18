@@ -1,0 +1,5 @@
+Filename: Summary_240
+Summary: {
+    "relevance": true,
+    "reason": "The video consistently shows a person holding a bottle across multiple frames, aligning with the user's query for a 'water bottle'."
+}

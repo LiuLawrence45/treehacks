@@ -12,7 +12,7 @@ async function makeInboundCall() {
   
   let twiml = new VoiceResponse();
   twiml.pause({ length: 10 });
-  twiml.say('Which models of airpods do you have available right now?')
+  twiml.say('Hi! I am Twilio, a virtual assistant for you!')
   twiml.pause({ length: 30 });
   twiml.hangup();
 

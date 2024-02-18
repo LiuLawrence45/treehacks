@@ -10,9 +10,6 @@
     "dev": "nodemon app.js",
     "start": "node app.js"
   },
-  "keywords": [],
-  "author": "Charlie Weems",
-  "license": "MIT",
   "dependencies": {
     "@deepgram/sdk": "^2.4.0",
     "colors": "^1.4.0",

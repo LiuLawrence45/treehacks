@@ -80,13 +80,13 @@ def process_frame(frame, results_array):
 
         results_array.append(result)
 
-        print(" Dense Captions:")
-        for caption in result.dense_captions.list:
-            print(f"   '{caption.text}', {caption.bounding_box}, Confidence: {caption.confidence:.4f}")
+        # # print(" Dense Captions:")
+        # for caption in result.dense_captions.list:
+        #     print(f"   '{caption.text}', {caption.bounding_box}, Confidence: {caption.confidence:.4f}")
 
-        print(" People:")
-        for person in result.people.list:
-            print(f"   {person.bounding_box}, Confidence {person.confidence:.4f}")
+        # print(" People:")
+        # for person in result.people.list:
+        #     print(f"   {person.bounding_box}, Confidence {person.confidence:.4f}")
 
     except Exception as e:
         print(f"Exception in processing frame: {e}")

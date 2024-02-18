@@ -8,6 +8,7 @@ import uuid
 from dotenv import load_dotenv
 import json
 from openai import OpenAI
+import subprocess
 
 load_dotenv()
 
@@ -74,6 +75,7 @@ def process_frames_with_gpt4(frames, results, batch_id):
 
 def analyze_and_summarize(results, batch_id, user_flag): ## HELPER
     # Assuming results is a list of dictionaries or similar structure that GPT can process
+    # global has_run_subprocess
     try:
         client = OpenAI(
                 # This is the default and can be omitted
@@ -169,6 +171,15 @@ Example 4: User Flag = "fast-moving car"
         "relevance": true,
         "reason": "The video consistently shows a fast-moving car across multiple frames, aligning with the user's query."
         }}
+The output must abide by the following rules.
+ 1. ALWAYS FINISH THE OUTPUT. Never send partial responses
+ 2. The output should ALWAYS be formatted as a JSON as such:
+        {{
+            "relevance": true,
+            "reason": "reasoning for relevance"
+        }}
+
+Take a deep breath, and think.
 """
                  
 ### OLD PROMPT.       
@@ -188,9 +199,6 @@ Example 4: User Flag = "fast-moving car"
 #                         "objects":[{"object": `summarized_objects`}]
 #                     }
 # """
-                 
-                 
-
 },
                 {"role": "user", "content": f"{results_json}"}
             ],
@@ -202,6 +210,20 @@ Example 4: User Flag = "fast-moving car"
 
         # Extracting text from the response
         summary = response.choices[0].message.content.strip()
+
+        try:
+            gpt_response_json = json.loads(summary)
+            
+            # Check if 'relevance' is true in the response
+            if gpt_response_json.get('relevance') is True:
+                # If relevant, execute the command
+                print("Relevance is true, executing command...")
+                # has_run_subprocess = True
+                subprocess.run(["npm", "run", "outbound"], cwd="/Users/lawrenceliu/23-24 Projects/treehacks/call-gpt/scripts")
+            else:
+                print("Relevance is false, not executing command.")
+        except json.JSONDecodeError:
+            print("Failed to parse GPT response as JSON.")
 
         # For dynamic naming, you could use a part of the summary or any other logic
         # dynamic_name = "Summary_" + str(uuid.uuid4())
@@ -223,12 +245,12 @@ def analyze_cache_all():
                 results = [line.strip() for line in file.readlines()]
                 dynamic_name, summary = analyze_and_summarize(results)
                 summary_json = json.dumps({'name': dynamic_name, 'summary': summary})
-                print(f"Processed {filename}: {summary_json}")
+                # print(f"Processed {filename}: {summary_json}")
                 # Write the filename and summary to another file in the cache folder
                 summary_filename = os.path.join(cache_folder, f"{dynamic_name}_summary.txt")
                 with open(summary_filename, 'w') as summary_file:
                     summary_file.write(f"Filename: {filename}\nSummary: {summary}")
-                print(f"Saved summary to {summary_filename}")
+                # print(f"Saved summary to {summary_filename}")
 
 def analyze_cache(results_array, batch_id, user_flag):
     cache_folder = 'processing/cv/cache/'

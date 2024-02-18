@@ -1,5 +1,5 @@
 Filename: Summary_240
 Summary: {
-    "action": [{"summary": "The man was initially seen walking in a room with other people, then standing with a group of people around him. In subsequent frames, the man was observed standing in a room with people sitting around, and later standing in a room with people sitting at tables."}],
-    "objects": [{"object": ["man", "room", "people", "table", "chair", "suitcase"]}]
+    "relevance": false,
+    "reason": "The video does not contain any instances of 'ritz crackers' appearing in the dense captions or people detected."
 }

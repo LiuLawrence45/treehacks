@@ -1,13 +1,5 @@
 Filename: Summary_360
 Summary: {
-    "action": [
-        {
-            "summary": "The man was holding a phone and standing in a room with other people sitting around. Another man was holding a cell phone and sitting at a table. A person was holding a device and sitting at a desk. A person was wearing a lanyard and standing in a room with a group of people. A woman was sitting at a table with a laptop."
-        }
-    ],
-    "objects": [
-        {
-            "object": ["phone", "cell phone", "device", "lanyard", "desk", "table", "laptop"]
-        }
-    ]
+    "relevance": true,
+    "reason": "The video contains multiple frames showing a man holding a red package of food, directly matching the user's query for 'ritz crackers'. The dense captions and people results consistently depict this scenario."
 }

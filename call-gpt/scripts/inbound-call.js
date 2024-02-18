@@ -12,17 +12,20 @@ async function makeInboundCall() {
   
   const client = require('twilio')(accountSid, authToken);
   
-  let twiml = new VoiceResponse();
-  twiml.pause({ length: 10 });
-  twiml.say('Which models of airpods do you have available right now?')
-  twiml.pause({ length: 30 });
-  twiml.hangup();
+  // let twiml = new VoiceResponse();
+  // // twiml.pause({ length: 10 });
+  // twiml.say({voice: 'alice'}, 'oh my god, your friend aaron chang was just violently touched')
+  // twiml.pause({ length: 6 });
+  // twiml.say({voice: 'alice'}, 'i will call the police for u')
+  // twiml.pause({ length: 2 });
+  // twiml.say({voice: 'alice'}, 'calling the police right now')
+  // // twiml.hangup();
 
-  console.log(twiml.toString())
+  // console.log(twiml.toString())
   
   await client.calls
     .create({
-        twiml: twiml.toString(),
+        url: "https://treehacks.ngrok.app/test",
         // to: process.env.APP_NUMBER,
         // from: process.env.FROM_NUMBER
         to: '+14122251447',

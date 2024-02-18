@@ -8,12 +8,9 @@ async function makeOutBoundCall() {
   
   const client = require('twilio')(accountSid, authToken);
 
-  // const axios = require('axios');
-  // const response = await axios.get('https://treehacks.ngrok.app/incoming');
-  // const twiml = response.data;
   await client.calls
     .create({
-        url: `https://treehacks.ngrok.app/incoming`,
+        url: "https://treehacks.ngrok.app/incoming",
         // url: "https://treehacks.ngrok.app/test",
         // twiml: twiml,
         // to: process.env.YOUR_NUMBER,

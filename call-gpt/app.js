@@ -55,15 +55,26 @@ app.ws("/connection", (ws, req) => {
   let interactionCount = 0
 
   // Incoming from MediaStream
-  ws.on("message", function message(data) {
+  ws.on("message", async function message(data) {
     const msg = JSON.parse(data);
     if (msg.event === "start") {
       streamSid = msg.start.streamSid;
       streamService.setStreamSid(streamSid);
       console.log(`Twilio -> Starting Media Stream for ${streamSid}`.underline.red);
-      const initialMessage = require('./app-initial.json').initialMessage;
-      // Then use the initialMessage in your code as needed
-      ttsService.generate({ partialResponseIndex: null, partialResponse: initialMessage }, 1);
+      try {
+        const response = await fetch('http://127.0.0.1:5000/data'); // Replace with your actual URL
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        const initialMessage = data.assistantPrompt; // Replace fieldName with the actual field you need
+
+        // Use the fetched initialMessage in your ttsService.generate call
+        ttsService.generate({ partialResponseIndex: null, partialResponse: initialMessage }, 1);
+      } catch (error) {
+        console.error('Failed to fetch initial message:', error);
+        // Handle error, possibly send an error message back via WebSocket
+      }
     } else if (msg.event === "media") {
       transcriptionService.send(msg.media.payload);
     } else if (msg.event === "mark") {

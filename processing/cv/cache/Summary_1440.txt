@@ -1,0 +1,5 @@
+Filename: Summary_1440
+Summary: {
+    "relevance": false,
+    "reason": "The user query for 'water bottle' is not relevant in the provided frames as there is no mention or indication of a water bottle in any of the dense captions or people results."
+}

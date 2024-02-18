@@ -1,0 +1,5 @@
+Filename: Summary_1320
+Summary: {
+    "relevance": false,
+    "reason": "The video does not contain any relevance to the user query about 'ritz cracker'. The dense captions and people results focus on a man taking a selfie, wearing a lanyard, sitting in a room, and other activities, with no mention or indication of ritz crackers."
+}

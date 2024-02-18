@@ -1,5 +1,5 @@
 Filename: Summary_480
 Summary: {
     "relevance": false,
-    "reason": "The video does not contain any relevance to the user query for a 'water bottle'."
+    "reason": "The video does not contain any relevance to the user query for 'ritz cracker'."
 }

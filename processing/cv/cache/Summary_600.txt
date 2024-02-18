@@ -1,0 +1,5 @@
+Filename: Summary_600
+Summary: {
+    "relevance": false,
+    "reason": "There is no mention or indication of 'ritz cracker' in any of the dense captions or people results across the frames."
+}

@@ -1,0 +1,5 @@
+Filename: Summary_960
+Summary: {
+    "relevance": false,
+    "reason": "There is no relevance to the user query 'ritz cracker' as the dense captions and people results do not mention or show any indication of ritz crackers in the frames."
+}

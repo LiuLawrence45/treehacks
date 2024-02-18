@@ -1,0 +1,5 @@
+Filename: Summary_840
+Summary: {
+    "relevance": false,
+    "reason": "The video does not contain any relevance to the query for 'ritz cracker'. There is no mention or indication of ritz crackers in any of the dense captions or people detected in the frames."
+}

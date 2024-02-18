@@ -1,0 +1,5 @@
+Filename: Summary_1200
+Summary: {
+    "relevance": false,
+    "reason": "The video does not contain any relevant information about 'ritz cracker'."
+}

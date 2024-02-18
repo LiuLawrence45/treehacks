@@ -1,0 +1,5 @@
+Filename: Summary_1080
+Summary: {
+    "relevance": false,
+    "reason": "The video does not contain any relevance to the user query for 'ritz cracker'. The dense captions and people results focus on a man holding a cell phone and do not mention ritz crackers."
+}

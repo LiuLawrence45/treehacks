@@ -1,0 +1,5 @@
+Filename: Summary_720
+Summary: {
+    "relevance": false,
+    "reason": "The video frames do not contain any relevance to the user query for 'ritz cracker'."
+}

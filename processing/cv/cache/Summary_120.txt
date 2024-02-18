@@ -1,5 +1,5 @@
 Filename: Summary_120
 Summary: {
     "relevance": false,
-    "reason": "The video does not contain any relevant instances of a water bottle."
+    "reason": "The video does not contain any relevant content related to 'ritz cracker'."
 }

@@ -16,16 +16,28 @@ class GptService extends EventEmitter {
   constructor() {
     super();
     this.openai = new OpenAI();
-    const prompts = require('./gpt-service-prompts.json');
-    const systemPrompt = prompts.systemPrompt; // Assuming the JSON file has a key named "systemPrompt"
-    const assistantPrompt = prompts.assistantPrompt; // Assuming the JSON file has a key named "assistantPrompt"
+    // Initialize userContext with empty values; will be set in init
+    this.userContext = [];
+    this.partialResponseIndex = 0;
 
-// Then use these prompts in your code as needed
-    this.userContext = [
-      { "role": "system", "content": systemPrompt },
-      { "role": "assistant", "content": assistantPrompt },
-    ],
-    this.partialResponseIndex = 0
+    // Call the init method to perform async operations
+    this.init();
+  }
+
+  async init() {
+    try {
+      const prompts = await fetch('http://127.0.0.1:5000/data').then(response => response.json());
+      const systemPrompt = prompts.systemPrompt; // Assuming the JSON file has a key named "systemPrompt"
+      const assistantPrompt = prompts.assistantPrompt; // Assuming the JSON file has a key named "assistantPrompt"
+
+      // Then use these prompts in your code as needed
+      this.userContext = [
+        { "role": "system", "content": systemPrompt },
+        { "role": "assistant", "content": assistantPrompt },
+      ];
+    } catch (error) {
+      console.error("Failed to initialize GptService:", error);
+    }
   }
 
 

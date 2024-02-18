@@ -3,30 +3,35 @@ const tools = [
   {
     type: "function",
     function: {
-      name: "checkInventory",
-      description: "Check the inventory of airpods, airpods pro or airpods max.",
+      name: "makeEmergencyCall",
+      description: "Automatically calls local emergency services",
       parameters: {
         type: "object",
         properties: {
-          model: {
+          emergencyPrompt: {
             type: "string",
-            "enum": ["airpods", "airpods pro", "airpods max"],
-            description: "The model of airpods, either the airpods, airpods pro or airpods max",
+            enum: ["medical", "ambulance", "hospital"],
+            description: "Keywords for getting an emergency ambulance"
           },
         },
-        required: ["model"],
+        required: ["emergencyCall"]
       },
       returns: {
         type: "object",
         properties: {
-          stock: {
-            type: "integer",
-            description: "An integer containing how many of the model are in currently in stock."
+          status: {
+            type: "string",
+            description: "Status of the emergency call attempt, indicating success or failure."
+          },
+          message: {
+            type: "string",
+            description: "A descriptive message of the call attempt outcome or next steps."
           }
         }
       }
-    },
+    }
   },
+
   {
     type: "function",
     function: {

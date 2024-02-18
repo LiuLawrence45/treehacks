@@ -46,7 +46,8 @@ def process_frames_with_gpt4(frames, results):
     # Generate unique id. 
     batch_id = uuid.uuid4()
 
-    dynamic_name, summary = analyze_and_summarize(results, batch_id)
+    # dynamic_name, summary = analyze_and_summarize(results, batch_id)
+
 
     # Get the frame width and height
     if frames:
@@ -71,7 +72,7 @@ def process_frames_with_gpt4(frames, results):
 
 
 
-def analyze_and_summarize(results):
+def analyze_and_summarize(results): ## HELPER
     # Assuming results is a list of dictionaries or similar structure that GPT can process
     try:
         client = OpenAI(
@@ -86,8 +87,8 @@ def analyze_and_summarize(results):
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "You are a highly intelligent AI trained to summarize results."},
-                {"role": "user", "content": f"Summarize these results: {results_json}"}
+                {"role": "system", "content": f"Below is a list of files that outline an action in JSON. Infer and tell me what action occurred between these files, specifically focusing on the people. Take a deep breath, and think clearly. Only state to me what you think the inferred action is, and the number of people in the frame over time."},
+                {"role": "user", "content": f"{results_json}"}
             ],
             temperature=0.5,
             top_p=1.0,
@@ -107,6 +108,23 @@ def analyze_and_summarize(results):
     except Exception as e:
         print(f"Error in analyze_and_summarize: {e}")
         return "Error", "Could not analyze and summarize results."
+    
+
+def analyze_cache():
+    cache_folder = 'processing/cv/cache/'
+    for filename in os.listdir(cache_folder):
+        if filename.endswith('.txt'):
+            with open(os.path.join(cache_folder, filename), 'r') as file:
+                results = [line.strip() for line in file.readlines()]
+                dynamic_name, summary = analyze_and_summarize(results)
+                summary_json = json.dumps({'name': dynamic_name, 'summary': summary})
+                print(f"Processed {filename}: {summary_json}")
+                # Write the filename and summary to another file in the cache folder
+                summary_filename = os.path.join(cache_folder, f"{dynamic_name}_summary.txt")
+                with open(summary_filename, 'w') as summary_file:
+                    summary_file.write(f"Filename: {filename}\nSummary: {summary}")
+                print(f"Saved summary to {summary_filename}")
+
     
 
 if __name__ == "__main__":

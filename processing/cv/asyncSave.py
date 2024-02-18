@@ -17,7 +17,7 @@ dotenv.load_dotenv()
 import json
 import requests
 from ultralytics import YOLO  # Assuming YOLOv8 is accessible through ultralytics
-from createCache import process_frames_with_gpt4, FrameCache
+from createCache import process_frames_with_gpt4, FrameCache, analyze_and_summarize, analyze_cache
 import sys
 # Load the model
 model = YOLO('processing/cv/smallest-YOLO.pt')
@@ -49,9 +49,9 @@ cap = cv2.VideoCapture(0)
 
 
 #Initialize FrameCache for GPT 4 
-frame_cache = FrameCache(reset_interval=6)
+frame_cache = FrameCache(reset_interval=10)
 
-executor = ThreadPoolExecutor(max_workers=4)
+executor = ThreadPoolExecutor(max_workers=6)
 
 language = "en"
 max_descriptions = 3
@@ -140,13 +140,16 @@ try:
         if i % 24 == 0:
             executor.submit(process_frame, frame, results_array)
 
-        if i % (24*6) == 0:
+        if i % (30*4) == 0:
             cached_frames = frame_cache.get_and_clear()
             executor.submit(process_frames_with_gpt4, cached_frames, results_array)
             results_array = []
         cv2.imshow('Video', frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
+            future = executor.submit(analyze_cache) ## ADDING ANALYze TO FUTURES
+
             break
 finally:
+    future.result() # WAITING FOR FUTURE TO FINISH
     cap.release()
     cv2.destroyAllWindows()

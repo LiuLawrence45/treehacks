@@ -145,7 +145,6 @@ try:
             executor.submit(process_frames_with_gpt4, cached_frames, results_array)
             results_array = []
         cv2.imshow('Video', frame)
-
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 finally:

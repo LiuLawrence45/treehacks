@@ -5,6 +5,11 @@ import cv2
 import numpy as np
 import os
 import uuid
+from dotenv import load_dotenv
+import json
+from openai import OpenAI
+
+load_dotenv()
 
 class FrameCache:
     def __init__(self, reset_interval=6):
@@ -36,8 +41,12 @@ class FrameCache:
 def process_frames_with_gpt4(frames, results):
     print(f"Processing {len(frames)} frames with GPT-4")
 
+
+
     # Generate unique id. 
     batch_id = uuid.uuid4()
+
+    dynamic_name, summary = analyze_and_summarize(results, batch_id)
 
     # Get the frame width and height
     if frames:
@@ -60,4 +69,58 @@ def process_frames_with_gpt4(frames, results):
 
     print(f"Saved frames to {video_filename} and results to {results_filename}.")
 
+
+
+def analyze_and_summarize(results):
+    # Assuming results is a list of dictionaries or similar structure that GPT can process
+    try:
+        client = OpenAI(
+                # This is the default and can be omitted
+                api_key=os.environ.get("OPENAI_API_KEY"),
+            )
+
+        # Convert results to JSON string for GPT processing
+        results_json = json.dumps(results)
+        
+        # Call the OpenAI API with the results using GPT-4
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a highly intelligent AI trained to summarize results."},
+                {"role": "user", "content": f"Summarize these results: {results_json}"}
+            ],
+            temperature=0.5,
+            top_p=1.0,
+            frequency_penalty=0.0,
+            presence_penalty=0.0
+        )
+
+        # Extracting text from the response
+        summary = response.choices[0].message.content.strip()
+
+        # For dynamic naming, you could use a part of the summary or any other logic
+        dynamic_name = "Summary_" + str(uuid.uuid4())
+        print("Dynamic name: ", dynamic_name)
+        print("Summary:" , summary)
+        return dynamic_name, summary
     
+    except Exception as e:
+        print(f"Error in analyze_and_summarize: {e}")
+        return "Error", "Could not analyze and summarize results."
+    
+
+if __name__ == "__main__":
+
+    cache_folder = 'processing/cv/cache/'
+    for filename in os.listdir(cache_folder):
+        if filename.endswith('.txt'):
+            with open(os.path.join(cache_folder, filename), 'r') as file:
+                results = [line.strip() for line in file.readlines()]
+                dynamic_name, summary = analyze_and_summarize(results)
+                summary_json = json.dumps({'name': dynamic_name, 'summary': summary})
+                print(f"Processed {filename}: {summary_json}")
+                # Write the filename and summary to another file in the cache folder
+                summary_filename = os.path.join(cache_folder, f"{dynamic_name}_summary.txt")
+                with open(summary_filename, 'w') as summary_file:
+                    summary_file.write(f"Filename: {filename}\nSummary: {summary}")
+                print(f"Saved summary to {summary_filename}")

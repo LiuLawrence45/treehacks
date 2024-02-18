@@ -24,7 +24,8 @@ import uuid
 # Load the model
 # model = YOLO('processing/cv/smallest-YOLO.pt')
 
-
+has_run_subprocess = False
+term_size = os.get_terminal_size()
 
 analysis_results = []
 # General variables
@@ -80,13 +81,14 @@ def process_frame(frame, results_array):
 
         results_array.append(result)
 
-        # # print(" Dense Captions:")
-        # for caption in result.dense_captions.list:
-        #     print(f"   '{caption.text}', {caption.bounding_box}, Confidence: {caption.confidence:.4f}")
+        print(" Dense Captions:")
+        for caption in result.dense_captions.list:
+            print(f"   '{caption.text}', {caption.bounding_box}, Confidence: {caption.confidence:.4f}")
 
-        # print(" People:")
-        # for person in result.people.list:
-        #     print(f"   {person.bounding_box}, Confidence {person.confidence:.4f}")
+        print(" People:")
+        for person in result.people.list:
+            print(f"   {person.bounding_box}, Confidence {person.confidence:.4f}")
+        print('=' * term_size.columns)
 
     except Exception as e:
         print(f"Exception in processing frame: {e}")

@@ -1,5 +1,0 @@
-Filename: Summary_360
-Summary: {
-    "relevance": true,
-    "reason": "The video contains multiple frames showing a man holding a red package of food, directly matching the user's query for 'ritz crackers'. The dense captions and people results consistently depict this scenario."
-}

@@ -1,5 +1,0 @@
-Filename: Summary_840
-Summary: {
-    "relevance": false,
-    "reason": "The video does not contain any frames showing a phone or phone-related activities. The focus is on a man taking a selfie and other objects, not on a phone."
-}

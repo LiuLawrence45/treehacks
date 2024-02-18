@@ -9,8 +9,10 @@ from dotenv import load_dotenv
 import json
 from openai import OpenAI
 import subprocess
+import threading
 
 load_dotenv()
+process_lock = threading.Lock()
 
 class FrameCache:
     def __init__(self, reset_interval=6):
@@ -36,11 +38,10 @@ class FrameCache:
             with self.lock:
                 self.frames.clear()
 
-
-
+has_called = False
 
 def process_frames_with_gpt4(frames, results, batch_id):
-    print(f"Processing {len(frames)} frames with GPT-4")
+    # print(f"Processing {len(frames)} frames with GPT-4")
 
 
 
@@ -73,9 +74,10 @@ def process_frames_with_gpt4(frames, results, batch_id):
 
 
 
+
 def analyze_and_summarize(results, batch_id, user_flag): ## HELPER
     # Assuming results is a list of dictionaries or similar structure that GPT can process
-    # global has_run_subprocess
+    global has_run_subprocess
     try:
         client = OpenAI(
                 # This is the default and can be omitted
@@ -181,24 +183,6 @@ The output must abide by the following rules.
 
 Take a deep breath, and think.
 """
-                 
-### OLD PROMPT.       
-# You are a company secretary that only speaks in JSON. Do not generate output that is not in properly formatted JSON. The input has the following format, composed of a list of chronological model outputs that contain the following.
-#                  1. 'denseCaptionsResult': describing the bounding box location of specific object in an image frame, along with text describing the object
-#                  2. 'peopleResult': describing the bounding box location of people in a given frame.
-        
-# Remember, the model outputs are chronological. Those at the top of the input happened earlier than those later in the input. 
-
-# Most importantly, extract and infer information from the input, specifically of people movements, interactions, and objects of prominence in the given frame. The output must abide by the following rules.
-#                  1. ALWAYS FINISH THE OUTPUT. Never send partial responses
-#                  2. When inferencing people movement, generate it as variable `summarized_actions`. This variable should show prominent actions and interactions that are inferred from movements of objects and people in frame. Be creative, yet accurate with finding interactions between objects/people. There should be logical jumps made from the data given--take a deep breath and think about what people movements are implied from the input. Further, the variable `summarized_objects`, should be a list of objects that are in frame and are prominent. `summarized objects` should look like, ["water bottle", "chips", "phone."]. 
-                 
-#                  3. The output should ALWAYS be formatted as a JSON as such:
-#                     {
-#                         "action": [{"summary": `summarized_actions`}],
-#                         "objects":[{"object": `summarized_objects`}]
-#                     }
-# """
 },
                 {"role": "user", "content": f"{results_json}"}
             ],
@@ -218,8 +202,10 @@ Take a deep breath, and think.
             if gpt_response_json.get('relevance') is True:
                 # If relevant, execute the command
                 print("Relevance is true, executing command...")
-                # has_run_subprocess = True
+                # has_called = True
+                
                 subprocess.run(["npm", "run", "outbound"], cwd="/Users/lawrenceliu/23-24 Projects/treehacks/call-gpt/scripts")
+
             else:
                 print("Relevance is false, not executing command.")
         except json.JSONDecodeError:

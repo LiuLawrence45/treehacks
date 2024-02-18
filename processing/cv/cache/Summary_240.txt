@@ -1,5 +1,0 @@
-Filename: Summary_240
-Summary: {
-    "relevance": false,
-    "reason": "The video does not contain any instances of 'ritz crackers' appearing in the dense captions or people detected."
-}

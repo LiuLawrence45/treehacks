@@ -1,5 +1,0 @@
-Filename: Summary_120
-Summary: {
-    "relevance": false,
-    "reason": "The user query does not align with the content of the frames. The frames primarily focus on a man taking a selfie and other related activities, with no mention or indication of 'ritz crackers' appearing."
-}

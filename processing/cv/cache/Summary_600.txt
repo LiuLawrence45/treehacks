@@ -1,5 +1,0 @@
-Filename: Summary_600
-Summary: {
-    "relevance": false,
-    "reason": "The video does not contain any relevance to the query about 'ritz crackers appearing'."
-}

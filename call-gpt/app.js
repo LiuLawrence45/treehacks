@@ -61,7 +61,9 @@ app.ws("/connection", (ws, req) => {
       streamSid = msg.start.streamSid;
       streamService.setStreamSid(streamSid);
       console.log(`Twilio -> Starting Media Stream for ${streamSid}`.underline.red);
-      ttsService.generate({partialResponseIndex: null, partialResponse: "Hey Welton! You're the cute anime boy West Lag. Do you need anything special today?"}, 1);
+      const initialMessage = require('./app-initial.json').initialMessage;
+      // Then use the initialMessage in your code as needed
+      ttsService.generate({ partialResponseIndex: null, partialResponse: initialMessage }, 1);
     } else if (msg.event === "media") {
       transcriptionService.send(msg.media.payload);
     } else if (msg.event === "mark") {

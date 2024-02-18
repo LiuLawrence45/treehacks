@@ -1,5 +1,0 @@
-Filename: Summary_600
-Summary: {
-    "relevance": false,
-    "reason": "The video does not contain any relevance to a water bottle. The dense captions and people results consistently mention a man taking a selfie, with no reference to a water bottle."
-}

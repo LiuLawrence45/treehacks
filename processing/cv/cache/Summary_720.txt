@@ -1,5 +1,0 @@
-Filename: Summary_720
-Summary: {
-    "relevance": true,
-    "reason": "The video contains multiple frames showing a bottle, directly matching the user's query."
-}

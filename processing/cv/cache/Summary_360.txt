@@ -1,5 +1,5 @@
 Filename: Summary_360
 Summary: {
-    "relevance": true,
-    "reason": "The video contains multiple frames showing a bottle being held by a person, directly matching the user's query."
+    "relevance": false,
+    "reason": "The video does not contain any frames specifically showing a water bottle. The dense captions and people results focus on individuals holding phones, taking selfies, and wearing lanyards, with no direct mention or indication of a water bottle."
 }

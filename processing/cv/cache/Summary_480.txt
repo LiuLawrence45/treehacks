@@ -1,5 +1,5 @@
 Filename: Summary_480
 Summary: {
     "relevance": false,
-    "reason": "The video does not contain any relevant information about a water bottle as there is no mention or indication of a water bottle in any of the dense captions or people results."
+    "reason": "The video does not contain any relevance to the user query for a 'water bottle'."
 }

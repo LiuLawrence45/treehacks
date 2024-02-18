@@ -21,6 +21,7 @@ from createCache import process_frames_with_gpt4, FrameCache, analyze_and_summar
 import sys
 from threading import Thread
 import uuid
+from shared_resources import execution_lock
 # Load the model
 # model = YOLO('processing/cv/smallest-YOLO.pt')
 
@@ -81,14 +82,14 @@ def process_frame(frame, results_array):
 
         results_array.append(result)
 
-        print(" Dense Captions:")
-        for caption in result.dense_captions.list:
-            print(f"   '{caption.text}', {caption.bounding_box}, Confidence: {caption.confidence:.4f}")
+        # print(" Dense Captions:")
+        # for caption in result.dense_captions.list:
+        #     print(f"   '{caption.text}', {caption.bounding_box}, Confidence: {caption.confidence:.4f}")
 
-        print(" People:")
-        for person in result.people.list:
-            print(f"   {person.bounding_box}, Confidence {person.confidence:.4f}")
-        print('=' * term_size.columns)
+        # print(" People:")
+        # for person in result.people.list:
+        #     print(f"   {person.bounding_box}, Confidence {person.confidence:.4f}")
+        # print('=' * term_size.columns)
 
     except Exception as e:
         print(f"Exception in processing frame: {e}")
@@ -110,12 +111,13 @@ try:
             executor.submit(process_frame, frame, results_array)
 
         if i % (30*4) == 0:
-            batch_id = i
-            cached_frames = frame_cache.get_and_clear()
-            executor.submit(process_frames_with_gpt4, cached_frames, results_array, batch_id)
-            analyze_thread = Thread(target=analyze_cache, args=(results_array, batch_id, user_flag))
-            analyze_thread.start()
-            results_array = []
+            with execution_lock:
+                batch_id = i
+                cached_frames = frame_cache.get_and_clear()
+                executor.submit(process_frames_with_gpt4, cached_frames, results_array, batch_id)
+                analyze_thread = Thread(target=analyze_cache, args=(results_array, batch_id, user_flag))
+                analyze_thread.start()
+                results_array = []
         cv2.imshow('Video', frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break

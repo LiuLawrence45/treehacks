@@ -11,6 +11,7 @@ from openai import OpenAI
 import subprocess
 import threading
 import requests
+from shared_resources import execution_lock, has_executed
 
 load_dotenv()
 process_lock = threading.Lock()
@@ -78,7 +79,7 @@ def process_frames_with_gpt4(frames, results, batch_id):
 
 def analyze_and_summarize(results, batch_id, user_flag): ## HELPER
     # Assuming results is a list of dictionaries or similar structure that GPT can process
-    global has_run_subprocess
+    global has_executed
     try:
         client = OpenAI(
                 # This is the default and can be omitted
@@ -201,86 +202,88 @@ Take a deep breath, and think.
             
             # Check if 'relevance' is true in the response
             if gpt_response_json.get('relevance') is True:
-                # If relevant, execute the command
-                print("Relevance is true, executing command...")
-                final_response = client.chat.completions.create(
-                    model="gpt-3.5-turbo",
-                    messages=[
-                        {"role": "system", "content": f"""          
-                You are a prompt generator. Look at the following examples. Make sure that your output always abides with JSON syntax and formatting. MAKE SURE TO ALWAYS FORMAT AS A JSON, with correct syntax. Never leave an output unfinished. 
-                1. Input: elderly person falling
-                    Output: {{
-                                "systemPrompt": "You are a calm and reassuring communicator, tasked with calling an emergency contact for an elderly person who has experienced a fall. Make sure to simply just explain that an elderly person has fell, no need for names. Your voice embodies compassion and patience, ensuring that your message conveys urgency without instilling panic. Your primary aim is to collect essential information while also offering solace to the emergency contact. Structure your queries to be clear and direct, limiting yourself to one question at a time to prevent overwhelming the listener. Inquire about the elderly individual's medical history and any immediate necessities, asking questions such as 'Do you know if they have any medical conditions I should be informed of?'. If the user asks for an ambulance, do not ask them any further questions and call the makeEmergencyCall function. Furthermore, in scenarios where the situation appears critical but there is no request for an ambulance, propose the option of summoning an ambulance in a gentle manner, asking, 'Would it be advisable for me to call an ambulance at this moment?'. Conversely, if the contact believes everything is under control, accept their assessment without insisting on further inquiries. Throughout the conversation, ensure to express your support and reassurance, reminding the contact of your readiness to assist. Incorporate a '•' symbol every 5 to 10 words, at natural pauses, to facilitate a fluid transition for text to speech delivery.",
-                                "assistantPrompt": "Hey there! Did you fall?"
+                with execution_lock:
+                    if not has_executed:
+                        # If relevant, execute the command
+                        print("Relevance is true, executing command...")
+                        final_response = client.chat.completions.create(
+                            model="gpt-3.5-turbo",
+                            messages=[
+                                {"role": "system", "content": f"""          
+                        You are a prompt generator. Look at the following examples. Make sure that your output always abides with JSON syntax and formatting. MAKE SURE TO ALWAYS FORMAT AS A JSON, with correct syntax. Never leave an output unfinished. 
+                        1. Input: elderly person falling
+                            Output: {{
+                                        "systemPrompt": "You are a calm and reassuring communicator, tasked with calling an emergency contact for an elderly person who has experienced a fall. Make sure to simply just explain that an elderly person has fell, no need for names. Your voice embodies compassion and patience, ensuring that your message conveys urgency without instilling panic. Your primary aim is to collect essential information while also offering solace to the emergency contact. Structure your queries to be clear and direct, limiting yourself to one question at a time to prevent overwhelming the listener. Inquire about the elderly individual's medical history and any immediate necessities, asking questions such as 'Do you know if they have any medical conditions I should be informed of?'. If the user asks for an ambulance, do not ask them any further questions and call the makeEmergencyCall function. Furthermore, in scenarios where the situation appears critical but there is no request for an ambulance, propose the option of summoning an ambulance in a gentle manner, asking, 'Would it be advisable for me to call an ambulance at this moment?'. Conversely, if the contact believes everything is under control, accept their assessment without insisting on further inquiries. Throughout the conversation, ensure to express your support and reassurance, reminding the contact of your readiness to assist. Incorporate a '•' symbol every 5 to 10 words, at natural pauses, to facilitate a fluid transition for text to speech delivery.",
+                                        "assistantPrompt": "Hey there! Did you fall?"
+                                    }}
+                                
+                        2. Input: Child lost in a mall
+                                Output: {{
+                                "systemPrompt": "You are a composed and empathetic communicator, tasked with informing a parent that their child has been found wandering alone in a mall. Your tone is comforting and patient, ensuring your message alleviates worry without causing distress. Your main goal is to collect important information while providing reassurance to the parent. Structure your questions to be clear and concise, asking one thing at a time to keep the conversation calm. Inquire about the child's name and any distinctive features or clothing to help identify them, such as 'Can you describe what they're wearing today?'. If the parent starts to panic, remind them calmly that the child is safe and ask if there's a preferred meeting point in the mall. Conversely, if the parent is nearby and can come immediately, confirm their arrival time, asking, 'How quickly can you get here?'. Throughout the exchange, emphasize your support and readiness to help, using pauses marked by '•' every 5 to 10 words to ensure clarity for text-to-speech delivery.",
+                                "assistantPrompt": "Hey there! You look lost. Is everything okay?"
+                                }}
+                                
+                        3. Input: water bottle falling
+                            Output: {{
+                            "systemPrompt": "You are a keen and observant communicator, tasked with addressing the moment a water bottle falls over in a quiet environment. Your tone is composed and attentive, ensuring your message captures the slight but noticeable event without causing any alarm. Your main goal is to calmly acknowledge the incident while offering to assist in any small way necessary. Ask a straightforward question, focusing on the immediate need, such as 'Would you like me to pick up the water bottle for you?'. If the situation seems to bother someone, offer a gentle reassurance, 'It's just a small spill, shall we clean it up together?'. Throughout the interaction, emphasize your willingness to help, inserting '•' every 5 to 10 words to facilitate clear and calm communication.",
+                            "assistantPrompt": "Hey there! Looks like your water bottle fell"
                             }}
-                         
-                2. Input: Child lost in a mall
-                        Output: {{
-                        "systemPrompt": "You are a composed and empathetic communicator, tasked with informing a parent that their child has been found wandering alone in a mall. Your tone is comforting and patient, ensuring your message alleviates worry without causing distress. Your main goal is to collect important information while providing reassurance to the parent. Structure your questions to be clear and concise, asking one thing at a time to keep the conversation calm. Inquire about the child's name and any distinctive features or clothing to help identify them, such as 'Can you describe what they're wearing today?'. If the parent starts to panic, remind them calmly that the child is safe and ask if there's a preferred meeting point in the mall. Conversely, if the parent is nearby and can come immediately, confirm their arrival time, asking, 'How quickly can you get here?'. Throughout the exchange, emphasize your support and readiness to help, using pauses marked by '•' every 5 to 10 words to ensure clarity for text-to-speech delivery.",
-                        "assistantPrompt": "Hey there! You look lost. Is everything okay?"
-                        }}
-                         
-                3. Input: water bottle falling
-                    Output: {{
-                    "systemPrompt": "You are a keen and observant communicator, tasked with addressing the moment a water bottle falls over in a quiet environment. Your tone is composed and attentive, ensuring your message captures the slight but noticeable event without causing any alarm. Your main goal is to calmly acknowledge the incident while offering to assist in any small way necessary. Ask a straightforward question, focusing on the immediate need, such as 'Would you like me to pick up the water bottle for you?'. If the situation seems to bother someone, offer a gentle reassurance, 'It's just a small spill, shall we clean it up together?'. Throughout the interaction, emphasize your willingness to help, inserting '•' every 5 to 10 words to facilitate clear and calm communication.",
-                    "assistantPrompt": "Hey there! Looks like your water bottle fell"
-                    }}
-                         
-                4. Input: person jumping
-                    Output: {{
-                    "systemPrompt": "You are an energetic and encouraging communicator, tasked with cheering on someone who is jumping, perhaps as part of an exercise or a joyful expression. Your voice is full of enthusiasm and support, making sure your message boosts their spirits without overwhelming them. Your primary aim is to motivate and acknowledge their effort, asking in a spirited manner, 'How high can you go? Keep it up!'. If they seem to be enjoying themselves, join in their excitement, 'That looks fun! Mind if I join you?'. Throughout the exchange, ensure to express your positive energy, using '•' every 5 to 10 words to keep the encouragement lively and engaging.",
-                    "assistantPrompt": "Hey! Looking good, need any tips or just cheering on while you're jumping?"
-                    }}
-                5. Input: person falling
-                        Output: {{
-                        "systemPrompt": "You are a compassionate and alert communicator, tasked with responding to someone who has just fallen. Your tone is caring and calm, ensuring your message offers support without adding to any embarrassment or discomfort. Your main goal is to assess their well-being and offer assistance, asking gently, 'Are you alright? Can I help you up?'. If they appear to be hurt, suggest further action in a reassuring manner, 'Do you need any medical attention or someone to call for help?'. Throughout the interaction, your focus is on their safety and comfort, inserting '•' every 5 to 10 words to ensure your concern is clearly communicated without rushing.",
-                        "assistantPrompt": "Oh no! Are you okay? Do you need help getting up?"
-                        }}
-                         
-                6. Input: Water bottle
-                    Output: {{
-                    "systemPrompt": "You are a thoughtful and environmentally conscious communicator, tasked with discussing the importance of staying hydrated and the benefits of using a reusable water bottle. Your tone is informative and encouraging, aiming to inspire positive habits without sounding judgmental. Begin by acknowledging the value of hydration, 'Staying hydrated is key to maintaining good health. Do you carry a water bottle with you?'. If the response is positive, commend their habit and perhaps suggest ways to make hydration more enjoyable, like adding fruit for flavor. If they don't have one, gently suggest the benefits of a reusable water bottle for both health and environmental reasons, 'A reusable water bottle can be a great companion throughout the day, and it's good for the planet too! Would you like some recommendations?'. Throughout the conversation, use '•' every 5 to 10 words to ensure your advice is clear and engaging.",
-                    "assistantPrompt": "Hello! How can I assist you in staying hydrated today?"
-                    }}
-                
-                7. Input: Ritz crackers
-                    Output: {{
-                    "systemPrompt": "You are a creative and culinary-minded communicator, tasked with sharing some fun and tasty snack ideas using Ritz crackers. Your tone is enthusiastic and inviting, aiming to spark culinary creativity and a love for simple, delicious snacks. Begin by highlighting the versatility of Ritz crackers, 'Ritz crackers are not just tasty on their own, but also a fantastic base for a variety of snacks. Have you tried any creative toppings?'. If they're looking for suggestions, offer a few easy yet delightful combinations, like cheese and apple slices or peanut butter and banana. Encourage them to experiment with their own ideas, 'What’s your favorite topping? There's so much you can do with them!'. Throughout the exchange, use '•' every 5 to 10 words to keep the suggestions clear and the conversation flowing smoothly.",
-                    "assistantPrompt": "Hey there! Ready to whip up some tasty snacks with Ritz crackers?"
-                    }}
+                                
+                        4. Input: person jumping
+                            Output: {{
+                            "systemPrompt": "You are an energetic and encouraging communicator, tasked with cheering on someone who is jumping, perhaps as part of an exercise or a joyful expression. Your voice is full of enthusiasm and support, making sure your message boosts their spirits without overwhelming them. Your primary aim is to motivate and acknowledge their effort, asking in a spirited manner, 'How high can you go? Keep it up!'. If they seem to be enjoying themselves, join in their excitement, 'That looks fun! Mind if I join you?'. Throughout the exchange, ensure to express your positive energy, using '•' every 5 to 10 words to keep the encouragement lively and engaging.",
+                            "assistantPrompt": "Hey! Looking good, need any tips or just cheering on while you're jumping?"
+                            }}
+                        5. Input: person falling
+                                Output: {{
+                                "systemPrompt": "You are a compassionate and alert communicator, tasked with responding to someone who has just fallen. Your tone is caring and calm, ensuring your message offers support without adding to any embarrassment or discomfort. Your main goal is to assess their well-being and offer assistance, asking gently, 'Are you alright? Can I help you up?'. If they appear to be hurt, suggest further action in a reassuring manner, 'Do you need any medical attention or someone to call for help?'. Throughout the interaction, your focus is on their safety and comfort, inserting '•' every 5 to 10 words to ensure your concern is clearly communicated without rushing.",
+                                "assistantPrompt": "Oh no! Are you okay? Do you need help getting up?"
+                                }}
+                                
+                        6. Input: Water bottle
+                            Output: {{
+                            "systemPrompt": "You are a thoughtful and environmentally conscious communicator, tasked with discussing the importance of staying hydrated and the benefits of using a reusable water bottle. Your tone is informative and encouraging, aiming to inspire positive habits without sounding judgmental. Begin by acknowledging the value of hydration, 'Staying hydrated is key to maintaining good health. Do you carry a water bottle with you?'. If the response is positive, commend their habit and perhaps suggest ways to make hydration more enjoyable, like adding fruit for flavor. If they don't have one, gently suggest the benefits of a reusable water bottle for both health and environmental reasons, 'A reusable water bottle can be a great companion throughout the day, and it's good for the planet too! Would you like some recommendations?'. Throughout the conversation, use '•' every 5 to 10 words to ensure your advice is clear and engaging.",
+                            "assistantPrompt": "Hello! How can I assist you in staying hydrated today?"
+                            }}
+                        
+                        7. Input: Ritz crackers
+                            Output: {{
+                            "systemPrompt": "You are a creative and culinary-minded communicator, tasked with sharing some fun and tasty snack ideas using Ritz crackers. Your tone is enthusiastic and inviting, aiming to spark culinary creativity and a love for simple, delicious snacks. Begin by highlighting the versatility of Ritz crackers, 'Ritz crackers are not just tasty on their own, but also a fantastic base for a variety of snacks. Have you tried any creative toppings?'. If they're looking for suggestions, offer a few easy yet delightful combinations, like cheese and apple slices or peanut butter and banana. Encourage them to experiment with their own ideas, 'What’s your favorite topping? There's so much you can do with them!'. Throughout the exchange, use '•' every 5 to 10 words to keep the suggestions clear and the conversation flowing smoothly.",
+                            "assistantPrompt": "Hey there! Ready to whip up some tasty snacks with Ritz crackers?"
+                            }}
 
-                """
-                },
-                                {"role": "user", "content": f"{user_flag}"}
-                            ],
-                            temperature=0.5,
-                            top_p=1.0,
-                            frequency_penalty=0.0,
-                            presence_penalty=0.0
-                        )
-                summary = final_response.choices[0].message.content.strip()
+                        """
+                        },
+                                        {"role": "user", "content": f"{user_flag}"}
+                                    ],
+                                    temperature=0.5,
+                                    top_p=1.0,
+                                    frequency_penalty=0.0,
+                                    presence_penalty=0.0
+                                )
+                        summary = final_response.choices[0].message.content.strip()
 
-                try: 
-                    payload = json.loads(final_response)
+                        # try: 
+                        payload = json.loads(summary)
 
-                    data_to_send = {
-                        "systemPrompt" : payload.get('systemPrompt'),
-                        "assistantPrompt" : payload.get('assistantPrompt')
-                    }
-                    response = requests.post("http://127.0.0.1:5000/data", json=data_to_send)
-                    print("Response is: ", response.text)
-                except:
-                    data_to_send = {
-                        "systemPrompt" : """ You are a calm and reassuring communicator. Your voice embodies compassion and patience, ensuring that your message conveys urgency without instilling panic. Your primary aim is to collect essential information about the caller, asking about their day. Structure your queries to be clear and direct, limiting yourself to one question at a time to prevent overwhelming the listener. Incorporate a '•' symbol every 5 to 10 words, at natural pauses, to facilitate a fluid transition for text to speech delivery.""",
-                        "assistantPrompt" : "Hey! How is your day going?"
-                    }
-                    response = requests.post("http://127.0.0.1:5000/data", json=data_to_send)
-                    
+                        data_to_send = {
+                            "systemPrompt" : payload.get('systemPrompt'),
+                            "assistantPrompt" : payload.get('assistantPrompt')
+                        }
+                        response = requests.post("http://127.0.0.1:5000/data", json=data_to_send)
+                        print("Response is: ", response.text)
+                        # except:
+                        #     data_to_send = {
+                        #         "systemPrompt" : """ You are a calm and reassuring communicator. Your voice embodies compassion and patience, ensuring that your message conveys urgency without instilling panic. Your primary aim is to collect essential information about the caller, asking about their day. Structure your queries to be clear and direct, limiting yourself to one question at a time to prevent overwhelming the listener. Incorporate a '•' symbol every 5 to 10 words, at natural pauses, to facilitate a fluid transition for text to speech delivery.""",
+                        #         "assistantPrompt" : "Hey! How is your day going?"
+                        #     }
+                        response = requests.post("http://127.0.0.1:5000/data", json=data_to_send)
+                        
 
 
-                # has_called = True
-                
-                subprocess.run(["npm", "run", "outbound"], cwd="/Users/lawrenceliu/23-24 Projects/treehacks/call-gpt/scripts")
+                        # has_called = True
+                        
+                        subprocess.run(["npm", "run", "outbound"], cwd="/Users/lawrenceliu/23-24 Projects/treehacks/call-gpt/scripts")
 
             else:
                 print("Relevance is false, not executing command.")

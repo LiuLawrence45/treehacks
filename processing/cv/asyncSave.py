@@ -22,6 +22,9 @@ import sys
 from threading import Thread
 import uuid
 from shared_resources import execution_lock
+from rich.console import Console
+from rich.panel import Panel
+from rich.text import Text
 # Load the model
 # model = YOLO('processing/cv/smallest-YOLO.pt')
 
@@ -46,7 +49,23 @@ params = {
     'model-version': 'latest'
 }
 
-user_flag = input("Enter the objects or actions you want to flag: ")
+console = Console()
+os.system('clear')
+app_name = Text("HORUS", style="bold magenta")
+description = "Advanced live video monitoring with real-time detection of flaggable behaviors. Integrated with Twilio for immediate, contextual alerts and communication."
+
+# Create a panel for the app name and description
+panel = Panel.fit(description, title=app_name, border_style="green")
+
+# Display the panel
+console.print(panel)
+
+# Prompt the user for input
+console.print("> Enter the objects or actions you want to flag: ", style="bold yellow", end="")
+
+# Wait for user input (this line is for demonstration and might need to be adapted for actual command processing)
+user_flag = input()
+# user_flag = input("Enter the objects or actions you want to flag: ")
 
 client = ImageAnalysisClient(endpoint = endpoint, credential = AzureKeyCredential(subscription_key))
 cap = cv2.VideoCapture(0)

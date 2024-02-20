@@ -43,8 +43,7 @@ VISION_ENDPOINT=""
 
 In /call-gpt, add .env with 
 
-# Your ngrok or server URL
-# E.g. 123.ngrok.io or myserver.fly.dev
+## Your ngrok or server URL (E.g. 123.ngrok.io or myserver.fly.dev)
 
 SERVER="treehacks.ngrok.app"
 

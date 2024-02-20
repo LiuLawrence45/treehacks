@@ -25,3 +25,46 @@ Retrieval when necessary, and then all sent to Twilio.
 2. Twilio
 
 Tunneled local server on ngrok so Twilio can access. Then, server receives live requests that uses TwixML to give appropriate responses to users, after running through our fine-tuned GPT. Utilizing whisper, users are able to have real-time conversation with Twilio, who is able to use custom functions and utilities. etc etc 
+
+
+
+## Running
+
+1. In directory treehacks: ngrok http 3000 --domain=treehacks.ngrok.app (or any ngrok domain).
+
+2. In directory treehacks/call-gpt: npm run dev
+
+3. In treehacks/processing/cv: python flaskPrompt.py
+
+In treehacks, add .env with
+
+AZURE_API_KEY=""
+VISION_ENDPOINT=""
+
+In /call-gpt, add .env with 
+
+# Your ngrok or server URL
+# E.g. 123.ngrok.io or myserver.fly.dev
+SERVER="treehacks.ngrok.app"
+
+# Service API Keys
+OPENAI_API_KEY=""
+DEEPGRAM_API_KEY=""
+XI_API_KEY="a38ad5190e33965faec7f22098a8f531"
+# Available models at a signed GET request to /v1/models
+XI_MODEL_ID=""
+
+# Uses "Rachel" voice by default
+# See https://api.elevenlabs.io/v1/voices
+# or visit https://elevenlabs.io/voice-library
+# for a list of all available voices
+VOICE_ID="21m00Tcm4TlvDq8ikWAM"
+
+# Configure your Twilio credentials if you want
+# to make test calls using '$ npm test'.
+TWILIO_ACCOUNT_SID=""
+TWILIO_AUTH_TOKEN=""
+FROM_NUMBER=''
+TO_NUMBER=''
+
+
